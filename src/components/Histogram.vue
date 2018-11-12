@@ -1,9 +1,9 @@
 <template>
   <svg class='histogram' :width='width' :height='height'>
-    <g class='bars'>
-      <rect v-for='(d, i) in bars' :key='i' :x='d.x' :width='d.width'
+    <transition-group tag='g' :css='false' @enter='enter' @leave='leave'>
+      <rect v-for='d in bars' :key='d.id' :x='d.x' :width='d.width'
         :y='d.y' :height='d.height' :fill=d.fill :stroke='d.fill' />
-    </g>
+    </transition-group>
     <g ref='xAxis' :transform='`translate(0, ${height - margin.bottom})`' />
     <g ref='brush' />
   </svg>
@@ -87,6 +87,7 @@ export default {
         const median = d3.median(d, d => d.score) || 0
 
         return {
+          id: `${x0}-${x1}`,
           x,
           width: this.xScale(x1) - x,
           y,
@@ -106,9 +107,21 @@ export default {
       }
       this.updateFilters({[this.id]: bounds});
     },
+    enter: function (el, done) {
+      TweenLite.fromTo(el, 0.5,
+        {scaleY: 0},
+        {scaleY: 1, onComplete: done}
+      )
+    },
+    leave: function (el, done) {
+      TweenLite.fromTo(el, 0.5,
+        {scaleY: 1},
+        {scaleY: 0, onComplete: done}
+      )
+    },
   }
 }
 </script>
 
-<style>
+<style scoped>
 </style>

@@ -53,7 +53,7 @@ export default {
       .then(resp => resp.json())
       .then(movies => {
         this.movies = _.chain(movies)
-          .map(d => Object.assign(d, {date: new Date(d.date)}))
+          .map((d, id) => Object.assign(d, {id, date: new Date(d.date)}))
           .filter(d => d.boxOffice && d.year >= startYear)
           .value();
         this.filtered = this.movies

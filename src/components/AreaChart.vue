@@ -1,8 +1,8 @@
 <template>
   <svg class='areachart' :width='width' :height='height'>
-    <g class='arcs'>
-      <path v-for='d in arcs' :d='d.path' :fill='d.fill' stroke='#fff' />
-    </g>
+    <transition-group tag='g' :css='false' @enter='enter' @leave='leave'>
+      <path v-for='d in arcs' :key='d.id' :d='d.path' :fill='d.fill' stroke='#fff' />
+    </transition-group>
     <g ref='xAxis' :transform='`translate(0, ${y0})`' />
     <g ref='yAxis' :transform='`translate(${margin.left}, 0)`' />
   </svg>
@@ -11,6 +11,7 @@
 <script>
 import _ from 'lodash'
 import * as d3 from 'd3'
+import {TweenLite} from 'gsap'
 
 const width = 1000
 const height = 300
@@ -86,6 +87,7 @@ export default {
         .map(d => {
           // for each arc, just need d & fill
           return {
+            id: d.id,
             path: this.areaGen([
               [this.xScale(d3.timeMonth.offset(d.date, -2)), this.y0],
               [this.xScale(d.date), this.yScale(d.boxOffice - this.medianBox)],
@@ -95,7 +97,19 @@ export default {
             data: d,
           }
         }).value()
-    }
+    },
+    enter: function (el, done) {
+      TweenLite.fromTo(el, 0.5,
+        {scaleY: 0, translateY: this.y0},
+        {scaleY: 1, translateY: 0, onComplete: done}
+      )
+    },
+    leave: function (el, done) {
+      TweenLite.fromTo(el, 0.5,
+        {scaleY: 1},
+        {scaleY: 0, onComplete: done}
+      )
+    },
   }
 }
 </script>
