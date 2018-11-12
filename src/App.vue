@@ -6,6 +6,13 @@
 In the last decade, most block buster hits have happened around or during the summer and winter holidays.
 <strong>Brush</strong> the histograms to filter the movies by metascore and/or box office figures, and <strong>hover</strong> the movies to see more details.
     </p>
+    <!-- AREA CHART -->
+    <div class='area-container'>
+      <div class='area-title'>
+        <strong>$ over/under median box office</strong>
+      </div>
+      <AreaChart v-bind='{movies, filtered}' />
+    </div>
     <!-- HISTOGRAM -->
     <Histogram v-for='({id, label, format}) in histograms'
       v-bind='{movies, filtered, id, label, format}' />
@@ -15,15 +22,15 @@ In the last decade, most block buster hits have happened around or during the su
 <script>
 import _ from 'lodash'
 import * as d3 from 'd3'
+import AreaChart from './components/AreaChart'
 import Histogram from './components/Histogram'
 
 const startYear = 2008;
-const numYears = 10;
 
 export default {
   name: 'app',
   components: {
-    Histogram,
+    Histogram, AreaChart,
   },
   data() {
     return {
@@ -60,5 +67,18 @@ export default {
   width: 600px;
   line-height: 2;
   margin: 20px auto;
+}
+
+.area-container {
+  position: relative;
+}
+
+.area-title {
+  position: absolute;
+  left: 65px;
+}
+
+.histograms {
+  display: inline-block;
 }
 </style>
