@@ -15,7 +15,7 @@ In the last decade, most block buster hits have happened around or during the su
     </div>
     <!-- HISTOGRAM -->
     <div class='histograms' v-for='({id, label, format}) in histograms'>
-      <Histogram v-bind='{movies, filtered, id, format}' />
+      <Histogram v-bind='{movies, filtered, id, format, updateFilters}' />
       <div>
         <strong>{{ label }}</strong>
       </div>
@@ -39,12 +39,13 @@ export default {
   },
   data() {
     return {
-      movies: [],
-      filtered: [],
       histograms: [
         {id: 'score', label: 'metascores'},
         {id: 'boxOffice', label: 'box office figures', format: d => `$${parseInt(d/ 1000000)}M`},
       ],
+      movies: [],
+      filters: {},
+      filtered: [],
     }
   },
   mounted() {
@@ -57,6 +58,19 @@ export default {
           .value();
         this.filtered = this.movies
       });
+  },
+  // computed: {
+  //   filtered: function() {
+  //     return _.filter(this.movies, d => _.every(this.filters, (bounds, key) =>
+  //       !bounds || bounds[0] < d[key] && d[key] < bounds[1]))
+  //   }
+  // },
+  methods: {
+    updateFilters: function(filter) {
+      this.filters = Object.assign(this.filters, filter)
+      this.filtered = _.filter(this.movies, d =>
+        _.every(this.filters, (bounds, key) => !bounds || bounds[0] < d[key] && d[key] < bounds[1]))
+    }
   }
 }
 </script>

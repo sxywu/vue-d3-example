@@ -19,7 +19,7 @@ const margin = {top: 20, right: 20, bottom: 20, left: 20}
 
 export default {
   name: 'histogram',
-  props: ['movies', 'filtered', 'id', 'format'],
+  props: ['movies', 'filtered', 'id', 'format', 'updateFilters'],
   data() {
     return {
       width, height, margin,
@@ -34,6 +34,13 @@ export default {
     this.colorScale = d3.scaleSequential(d3.interpolateViridis)
 
     this.xAxis = d3.axisBottom().scale(this.xScale).tickFormat(this.format)
+    this.brush = d3.brushX().extent([
+      [margin.left, margin.top],
+      [width - margin.right, height - margin.bottom]
+    ]).on('brush', this.brushEnd)
+  },
+  mounted() {
+    d3.select(this.$refs.brush).call(this.brush)
   },
   watch: {
     movies: function() {
@@ -87,7 +94,18 @@ export default {
           fill: this.colorScale(median),
         }
       })
-    }
+    },
+    brushEnd: function() {
+      let bounds = null;
+      if (d3.event.selection) {
+        const [x1, x2] = d3.event.selection;
+        bounds = [
+          this.xScale.invert(x1),
+          this.xScale.invert(x2),
+        ]
+      }
+      this.updateFilters({[this.id]: bounds});
+    },
   }
 }
 </script>
