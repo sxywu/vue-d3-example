@@ -19,7 +19,7 @@ const margin = {top: 20, right: 20, bottom: 20, left: 20}
 
 export default {
   name: 'histogram',
-  props: ['movies', 'filtered', 'id', 'label', 'format'],
+  props: ['movies', 'filtered', 'id', 'format'],
   data() {
     return {
       width, height, margin,

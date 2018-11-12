@@ -14,8 +14,13 @@ In the last decade, most block buster hits have happened around or during the su
       <AreaChart v-bind='{movies, filtered}' />
     </div>
     <!-- HISTOGRAM -->
-    <Histogram v-for='({id, label, format}) in histograms'
-      v-bind='{movies, filtered, id, label, format}' />
+    <div class='histograms' v-for='({id, label, format}) in histograms'>
+      <Histogram v-bind='{movies, filtered, id, format}' />
+      <div>
+        <strong>{{ label }}</strong>
+      </div>
+    </div>
+
   </div>
 </template>
 
