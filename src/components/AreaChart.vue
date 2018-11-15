@@ -99,15 +99,15 @@ export default {
         }).value()
     },
     enter: function (el, done) {
-      TweenLite.fromTo(el, 0.5,
-        {scaleY: 0, translateY: this.y0},
-        {scaleY: 1, translateY: 0, onComplete: done}
+      TweenLite.fromTo(el, 0.25,
+        {scaleY: 0, svgOrigin: `0 ${this.y0}`},
+        {scaleY: 1, onComplete: done}
       )
     },
     leave: function (el, done) {
-      TweenLite.fromTo(el, 0.5,
+      TweenLite.fromTo(el, 0.25,
         {scaleY: 1},
-        {scaleY: 0, onComplete: done}
+        {scaleY: 0, svgOrigin: `0 ${this.y0}`, onComplete: done}
       )
     },
   }
