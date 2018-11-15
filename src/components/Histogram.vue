@@ -1,9 +1,9 @@
 <template>
   <svg class='histogram' :width='width' :height='height'>
-    <transition-group tag='g' :css='false' @enter='enter' @leave='leave'>
+    <g class='bars'>
       <rect v-for='d in bars' :key='d.id' :x='d.x' :width='d.width'
         :y='d.y' :height='d.height' :fill=d.fill :stroke='d.fill' />
-    </transition-group>
+    </g>
     <g ref='xAxis' :transform='`translate(0, ${height - margin.bottom})`' />
     <g ref='brush' />
   </svg>
@@ -12,6 +12,7 @@
 <script>
 import _ from 'lodash'
 import * as d3 from 'd3'
+import {TweenMax} from 'gsap'
 
 const width = 500
 const height = 120
@@ -38,6 +39,7 @@ export default {
       [margin.left, margin.top],
       [width - margin.right, height - margin.bottom]
     ]).on('brush', this.brushEnd)
+    .on('end', this.brushEnd)
   },
   mounted() {
     d3.select(this.$refs.brush).call(this.brush)
@@ -80,20 +82,37 @@ export default {
       const bins = this.histogram(this.filtered)
 
       // calculate rect bar for each bin
-      this.bars = bins.map(d => {
+      this.bars = bins.map((d, i) => {
         const {x0, x1} = d
         const x = this.xScale(x0)
-        const y = this.yScale(d.length)
-        const median = d3.median(d, d => d.score) || 0
+        const y = this.bars[i] ? this.bars[i].toY : this.yScale(0)
+        const toY = this.yScale(d.length)
+        const fill = this.colorScale(d3.median(d, d => d.score) || 0)
 
         return {
-          id: `${x0}-${x1}`,
+          id: i,
           x,
           width: this.xScale(x1) - x,
-          y,
+          y, toY,
           height: height - margin.bottom - y,
-          fill: this.colorScale(median),
+          toHeight: height - margin.bottom - toY,
+          fill,
         }
+      })
+
+      // and then animate them
+      const tween = TweenMax.staggerFromTo(this.bars, 0.25, {
+        // from
+        cycle: {
+          y: (i) => this.bars[i].y,
+          height: (i) => this.bars[i].height,
+        }
+      }, {
+        // to
+        cycle: {
+          y: (i) => this.bars[i].toY,
+          height: (i) => this.bars[i].toHeight,
+        },
       })
     },
     brushEnd: function() {
@@ -106,18 +125,6 @@ export default {
         ]
       }
       this.updateFilters({[this.id]: bounds});
-    },
-    enter: function (el, done) {
-      TweenLite.fromTo(el, 0.5,
-        {scaleY: 0},
-        {scaleY: 1, onComplete: done}
-      )
-    },
-    leave: function (el, done) {
-      TweenLite.fromTo(el, 0.5,
-        {scaleY: 1},
-        {scaleY: 0, onComplete: done}
-      )
     },
   }
 }
