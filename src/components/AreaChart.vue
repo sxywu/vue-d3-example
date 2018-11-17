@@ -1,11 +1,23 @@
 <template>
-  <svg class='areachart' :width='width' :height='height'>
-    <transition-group tag='g' :css='false' @enter='enter' @leave='leave'>
-      <path v-for='d in arcs' :key='d.id' :d='d.path' :fill='d.fill' stroke='#fff' />
-    </transition-group>
-    <g ref='xAxis' :transform='`translate(0, ${y0})`' />
-    <g ref='yAxis' :transform='`translate(${margin.left}, 0)`' />
-  </svg>
+  <div class='areachart'>
+    <svg :width='width' :height='height'>
+      <transition-group tag='g' :css='false' @enter='enter' @leave='leave'>
+        <path v-for='d in arcs' class='arc' :key='d.id' :d='d.path' :fill='d.fill' stroke='#fff'
+          @mouseenter='() => hovered = d' @mouseleave='() => hovered = null' />
+      </transition-group>
+      <g ref='xAxis' :transform='`translate(0, ${y0})`' />
+      <g ref='yAxis' :transform='`translate(${margin.left}, 0)`' />
+    </svg>
+    <div v-if='hovered' class='hovered' :style='{
+      top: `${hovered.y + 20}px`,
+      left: `${hovered.x}px`,
+      }'>
+      <strong>title</strong> {{ hovered.data.title }}<br />
+      <strong>date</strong> {{ formatDate(hovered.data.date) }}<br />
+      <strong>metascore</strong> {{ hovered.data.score }}<br />
+      <strong>box office</strong> {{ formatBox(hovered.data.boxOffice) }}<br />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -26,6 +38,7 @@ export default {
       arcs: [],
       medianBox: 0,
       y0: 0,
+      hovered: null,
     }
   },
   created() {
@@ -85,16 +98,18 @@ export default {
         // put biggest arcs in the background
         .sortBy(d => -Math.abs(d.boxOffice - this.medianBox))
         .map(d => {
+          const x = this.xScale(d.date)
+          const y = this.yScale(d.boxOffice - this.medianBox)
           // for each arc, just need d & fill
           return {
             id: d.id,
             path: this.areaGen([
               [this.xScale(d3.timeMonth.offset(d.date, -2)), this.y0],
-              [this.xScale(d.date), this.yScale(d.boxOffice - this.medianBox)],
+              [x, y],
               [this.xScale(d3.timeMonth.offset(d.date, 2)), this.y0],
             ]),
             fill: this.colorScale(d.score),
-            data: d,
+            data: d, x, y,
           }
         }).value()
     },
@@ -110,9 +125,33 @@ export default {
         {scaleY: 0, svgOrigin: `0 ${this.y0}`, onComplete: done}
       )
     },
+    formatDate: function(date) {
+      return d3.timeFormat('%b %d, %Y')(date)
+    },
+    formatBox: function(box) {
+      return d3.format("$,.0f")(box)
+    }
   }
 }
 </script>
 
 <style>
+.areachart {
+  position: relative;
+}
+
+.arc {
+  cursor: pointer;
+}
+
+.hovered {
+  position: absolute;
+  padding: 5px 10px;
+  background-color: #fff;
+  box-shadow: 0 0 5px #cfcfcf;
+  transform: translate(-50%);
+  pointer-events: none;
+  line-height: 1.6;
+  width: 240px;
+}
 </style>
