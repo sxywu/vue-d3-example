@@ -11,7 +11,7 @@ In the last decade, most block buster hits have happened around or during the su
       <div class='area-title'>
         <strong>$ over/under median box office</strong>
       </div>
-      <AreaChart v-bind='{movies, filtered}' />
+      <AreaChart v-bind='{movies, filtered, holidays}' />
     </div>
     <!-- HISTOGRAM -->
     <div class='histograms' v-for='({id, label, format}) in histograms'>
@@ -30,7 +30,14 @@ import * as d3 from 'd3'
 import AreaChart from './components/AreaChart'
 import Histogram from './components/Histogram'
 
-const startYear = 2008;
+const startYear = 2008
+const holidays = []
+_.times(10, i => {
+  // summer holidays
+  holidays.push([new Date(`6/1/${startYear + i}`), new Date(`8/30/${startYear + i}`)])
+  // winter holidays
+  holidays.push([new Date(`11/1/${startYear + i}`), new Date(`12/31/${startYear + i}`)])
+})
 
 export default {
   name: 'app',
@@ -46,6 +53,7 @@ export default {
       movies: [],
       filters: {},
       filtered: [],
+      holidays,
     }
   },
   mounted() {

@@ -1,10 +1,19 @@
 <template>
   <div class='areachart'>
     <svg :width='width' :height='height'>
+      <!-- HOLIDAYS -->
+      <g class='holidays'>
+        <g v-for='d in texts' :transform='`translate(${d.x}, ${36})`'>
+          <line :x1='-d.width / 2' :x2='d.width / 2' :stroke='d.fill' />
+          <text dy='-.35em' text-anchor='middle' :fill='d.fill'>{{ d.text }}</text>
+        </g>
+      </g>
+      <!-- MOVIE ARCS -->
       <transition-group tag='g' :css='false' @enter='enter' @leave='leave'>
         <path v-for='d in arcs' class='arc' :key='d.id' :d='d.path' :fill='d.fill' stroke='#fff'
           @mouseenter='() => hovered = d' @mouseleave='() => hovered = null' />
       </transition-group>
+      <!-- AXES -->
       <g ref='xAxis' :transform='`translate(0, ${y0})`' />
       <g ref='yAxis' :transform='`translate(${margin.left}, 0)`' />
     </svg>
@@ -31,11 +40,12 @@ const margin = {top: 0, right: 0, bottom: 20, left: 60}
 
 export default {
   name: 'areachart',
-  props: ['movies', 'filtered'],
+  props: ['movies', 'filtered', 'holidays'],
   data() {
     return {
       width, height, margin,
       arcs: [],
+      texts: [],
       medianBox: 0,
       y0: 0,
       hovered: null,
@@ -56,6 +66,7 @@ export default {
   watch: {
     movies: function() {
       this.calculateScales()
+      this.calculateHolidays()
       d3.select(this.$refs.xAxis).call(this.xAxis)
       d3.select(this.$refs.yAxis).call(this.yAxis)
         .select('.domain').remove()
@@ -112,6 +123,18 @@ export default {
             data: d, x, y,
           }
         }).value()
+    },
+    calculateHolidays: function() {
+      this.texts = _.map(this.holidays, (d, i) => {
+        const [d1, d2] = d;
+        const x1 = this.xScale(d1);
+        const x2 = this.xScale(d2);
+        return {
+          x: (x1 + x2) / 2, width: x2 - x1,
+          fill: i % 2 === 0 ? 'rgb(253, 174, 97)' : 'rgb(116, 173, 209)',
+          text: i % 2 === 0 ? 's' : 'w',
+        };
+      });
     },
     enter: function (el, done) {
       TweenLite.fromTo(el, 0.25,
