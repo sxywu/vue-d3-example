@@ -27,27 +27,19 @@ export default {
       bars: [],
     }
   },
-  created() {
-    this.xScale = d3.scaleLinear().range([margin.left, width - margin.right])
-    this.histogram = d3.histogram()
-
-    this.yScale = d3.scaleLinear().range([height - margin.bottom, margin.top])
-    this.colorScale = d3.scaleSequential(d3.interpolateViridis)
-
-    this.xAxis = d3.axisBottom().scale(this.xScale).tickFormat(this.format)
+  mounted() {
     this.brush = d3.brushX().extent([
       [margin.left, margin.top],
       [width - margin.right, height - margin.bottom]
     ]).on('brush', this.brushEnd)
     .on('end', this.brushEnd)
-  },
-  mounted() {
+
     d3.select(this.$refs.brush).call(this.brush)
   },
   watch: {
     movies: function() {
       this.calculateScales()
-      d3.select(this.$refs.xAxis).call(this.xAxis)
+      this.renderAxes()
     },
     filtered: function() {
       this.calculateData()
@@ -59,21 +51,28 @@ export default {
 
       // colors
       const colorDomain = d3.extent(this.movies, d => d.score);
-      this.colorScale.domain(colorDomain).nice()
+      this.colorScale = d3.scaleSequential(d3.interpolateViridis)
+        .domain(colorDomain).nice()
 
       // x is the attribute
       const xDomain = d3.extent(this.movies, d => d[this.id])
-      this.xScale.domain(xDomain).nice()
+      this.xScale = d3.scaleLinear().domain(xDomain).nice()
+        .range([margin.left, width - margin.right])
 
       // get the bins
-      this.histogram.domain(this.xScale.domain())
+      this.histogram = d3.histogram().domain(this.xScale.domain())
         .thresholds(this.xScale.ticks(50))
         .value(d => d[this.id])
       const bins = this.histogram(this.movies)
 
       // calculate y from the bins
       const yMax = d3.max(bins, d => d.length)
-      this.yScale.domain([0, yMax])
+      this.yScale = d3.scaleLinear().domain([0, yMax])
+        .range([height - margin.bottom, margin.top])
+    },
+    renderAxes: function() {
+      const xAxis = d3.axisBottom().scale(this.xScale).tickFormat(this.format)
+      d3.select(this.$refs.xAxis).call(xAxis)
     },
     calculateData: function() {
       if (!this.filtered.length) return

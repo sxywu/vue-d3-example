@@ -67,12 +67,6 @@ export default {
         this.filtered = this.movies
       });
   },
-  // computed: {
-  //   filtered: function() {
-  //     return _.filter(this.movies, d => _.every(this.filters, (bounds, key) =>
-  //       !bounds || bounds[0] < d[key] && d[key] < bounds[1]))
-  //   }
-  // },
   methods: {
     updateFilters: function(filter) {
       this.filters = Object.assign(this.filters, filter)

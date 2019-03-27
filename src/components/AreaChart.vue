@@ -51,25 +51,11 @@ export default {
       hovered: null,
     }
   },
-  created() {
-    this.xScale = d3.scaleTime().range([margin.left, width - margin.right])
-    this.yScale = d3.scaleLinear().range([height - margin.bottom, margin.top])
-    this.colorScale = d3.scaleSequential(d3.interpolateViridis)
-
-    this.areaGen = d3.area().curve(d3.curveCatmullRom)
-
-    this.xAxis = d3.axisBottom().scale(this.xScale).tickFormat(this.format)
-    this.yAxis = d3.axisLeft().scale(this.yScale)
-      .tickSizeOuter(0)
-      .tickFormat(d => `${d3.format('$')(parseInt(d / 1000000))}M`)
-  },
   watch: {
     movies: function() {
       this.calculateScales()
       this.calculateHolidays()
-      d3.select(this.$refs.xAxis).call(this.xAxis)
-      d3.select(this.$refs.yAxis).call(this.yAxis)
-        .select('.domain').remove()
+      this.renderAxes()
     },
     filtered: function() {
       this.calculateData()
@@ -84,22 +70,32 @@ export default {
 
       // colors
       const colorDomain = d3.extent(this.movies, d => d.score);
-      this.colorScale.domain(colorDomain).nice()
+      this.colorScale = d3.scaleSequential(d3.interpolateViridis).domain(colorDomain).nice()
 
       // x scale with dates
       const [minDate, maxDate] = d3.extent(this.movies, d => d.date)
-      this.xScale.domain([
+      this.xScale = d3.scaleTime().domain([
         d3.timeMonth.offset(minDate, -2),
         d3.timeMonth.offset(maxDate, 2),
-      ])
+      ]).range([margin.left, width - margin.right])
 
       // y scale with boxOffice - medianBox
       const yExtent = d3.extent(this.movies, d => d.boxOffice - this.medianBox)
-      this.yScale.domain(yExtent)
+      this.yScale = d3.scaleLinear().domain(yExtent).range([height - margin.bottom, margin.top])
       this.y0 = this.yScale(0)
 
       // update area generater
-      this.areaGen.y0(this.y0)
+      this.areaGen = d3.area().curve(d3.curveCatmullRom).y0(this.y0)
+    },
+    renderAxes: function() {
+      const xAxis = d3.axisBottom().scale(this.xScale).tickFormat(this.format)
+      const yAxis = d3.axisLeft().scale(this.yScale)
+        .tickSizeOuter(0)
+        .tickFormat(d => `${d3.format('$')(parseInt(d / 1000000))}M`)
+
+      d3.select(this.$refs.xAxis).call(xAxis)
+      d3.select(this.$refs.yAxis).call(yAxis)
+        .select('.domain').remove()
     },
     calculateData: function() {
       if (!this.filtered.length) return
