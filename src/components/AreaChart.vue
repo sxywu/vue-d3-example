@@ -36,6 +36,7 @@ export default {
   watch: {
     movies: function() {
       this.calculateScales()
+      this.calculateData()
     },
   },
   methods: {
