@@ -70,9 +70,6 @@ export default {
   },
   methods: {
     updateFilters: function(filter) {
-      this.filters = Object.assign(this.filters, filter)
-      this.filtered = _.filter(this.movies, d =>
-        _.every(this.filters, (bounds, key) => !bounds || bounds[0] < d[key] && d[key] < bounds[1]))
     }
   }
 }

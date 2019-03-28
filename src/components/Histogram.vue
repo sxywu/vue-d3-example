@@ -34,7 +34,7 @@ export default {
     ]).on('brush', this.brushEnd)
     .on('end', this.brushEnd)
 
-    d3.select(this.$refs.brush).call(this.brush)
+    // call brush on g element
   },
   watch: {
     movies: function() {
@@ -115,15 +115,6 @@ export default {
       })
     },
     brushEnd: function() {
-      let bounds = null;
-      if (d3.event.selection) {
-        const [x1, x2] = d3.event.selection;
-        bounds = [
-          this.xScale.invert(x1),
-          this.xScale.invert(x2),
-        ]
-      }
-      this.updateFilters({[this.id]: bounds});
     },
   }
 }
