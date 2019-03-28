@@ -45,6 +45,7 @@ export default {
     Histogram, AreaChart,
   },
   data() {
+    // register any data we want to track changes of
     return {
       histograms: [
         {id: 'score', label: 'metascores'},
