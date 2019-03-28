@@ -37,9 +37,6 @@ export default {
     movies: function() {
       this.calculateScales()
     },
-    filtered: function() {
-      this.calculateData()
-    }
   },
   methods: {
     calculateScales: function() {
