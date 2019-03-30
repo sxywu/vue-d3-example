@@ -66,9 +66,7 @@ export default {
         .tickSizeOuter(0)
         .tickFormat(d => `${d3.format('$')(parseInt(d / 1000000))}M`)
 
-      d3.select(this.$refs.xAxis).call(xAxis)
-      d3.select(this.$refs.yAxis).call(yAxis)
-        .select('.domain').remove()
+      // call axes on group elements
     },
     enter: function (el, done) {
       TweenLite.fromTo(el, 0.25,
