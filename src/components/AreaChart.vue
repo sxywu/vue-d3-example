@@ -37,6 +37,7 @@ export default {
     movies: function() {
       this.calculateScales()
       this.calculateData()
+      this.renderAxes()
     },
   },
   methods: {
@@ -61,12 +62,16 @@ export default {
       // calculate arcs from the filtered movies
     },
     renderAxes: function() {
+      if (!this.xAxis || !this.yAxis) return
+
       const xAxis = d3.axisBottom().scale(this.xScale).tickFormat(this.format)
       const yAxis = d3.axisLeft().scale(this.yScale)
         .tickSizeOuter(0)
         .tickFormat(d => `${d3.format('$')(parseInt(d / 1000000))}M`)
 
       // call axes on group elements
+      d3.select(this.$refs.xAxis).call(xAxis)
+      d3.select(this.$refs.yAxis).call(yAxis)
     },
     enter: function (el, done) {
       TweenLite.fromTo(el, 0.25,
