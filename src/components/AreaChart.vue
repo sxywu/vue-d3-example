@@ -48,11 +48,12 @@ export default {
 
       // calculate median box office
 
-      // y scale with boxOffice - medianBox
-      
-      // colors with metascores
+      // calculate median box
 
+      // y scale with boxOffice - medianBox
       // this.y0 = this.yScale(0)
+
+      // colors with metascores
 
       // update area generater
     },
@@ -62,7 +63,7 @@ export default {
       // calculate arcs from the filtered movies
     },
     renderAxes: function() {
-      if (!this.xAxis || !this.yAxis) return
+      if (!this.xScale || !this.yScale) return
 
       const xAxis = d3.axisBottom().scale(this.xScale).tickFormat(this.format)
       const yAxis = d3.axisLeft().scale(this.yScale)
@@ -72,6 +73,7 @@ export default {
       // call axes on group elements
       d3.select(this.$refs.xAxis).call(xAxis)
       d3.select(this.$refs.yAxis).call(yAxis)
+        .selectAll('path').remove()
     },
     enter: function (el, done) {
       TweenLite.fromTo(el, 0.25,
