@@ -44,13 +44,13 @@ export default {
     calculateScales: function() {
       if (!this.movies.length) return
 
-      // calculate median box office
-
-      // colors with metascores
-
       // x scale with dates
 
+      // calculate median box office
+
       // y scale with boxOffice - medianBox
+      
+      // colors with metascores
 
       // this.y0 = this.yScale(0)
 
