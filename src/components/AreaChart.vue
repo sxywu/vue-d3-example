@@ -20,7 +20,7 @@ const margin = {top: 0, right: 0, bottom: 20, left: 60}
 
 export default {
   name: 'areachart',
-  props: ['movies', 'filtered', 'holidays'],
+  props: [],
   data() {
     return {
       width, height, margin,

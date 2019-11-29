@@ -11,7 +11,7 @@ In the last decade, most block buster hits have happened around or during the su
       <div class='area-title'>
         <strong>$ over/under median box office</strong>
       </div>
-      <AreaChart v-bind='{movies}' />
+      <AreaChart v-bind='{}' />
     </div>
     <!-- HISTOGRAM -->
     <div class='histograms' v-for='({id, label, format}) in histograms'>
