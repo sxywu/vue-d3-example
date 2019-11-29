@@ -5,7 +5,6 @@
         :y='d.y' :height='d.height' :fill=d.fill :stroke='d.fill' />
     </g>
     <g ref='xAxis' :transform='`translate(0, ${height - margin.bottom})`' />
-    <g ref='brush' />
   </svg>
 </template>
 
@@ -28,13 +27,6 @@ export default {
     }
   },
   mounted() {
-    this.brush = d3.brushX().extent([
-      [margin.left, margin.top],
-      [width - margin.right, height - margin.bottom]
-    ]).on('brush', this.brushEnd)
-    .on('end', this.brushEnd)
-
-    // call brush on g element
   },
   watch: {
     movies: function() {
@@ -113,8 +105,6 @@ export default {
           height: (i) => this.bars[i].toHeight,
         },
       })
-    },
-    brushEnd: function() {
     },
   }
 }
